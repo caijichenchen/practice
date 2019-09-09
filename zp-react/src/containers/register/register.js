@@ -1,9 +1,13 @@
 /* 用 户 注 册 的 路 由 组 件 */
 import React,{Component} from 'react'
 import { NavBar, WingBlank, List, InputItem, WhiteSpace, Radio, Button } from 'antd-mobile'
+import { connect } from 'react-redux'
 import Logo from '../../components/logo/logo.js'
+import { Redirect } from 'react-router-dom'
+import { register } from '../../redux/actions.js'
 const ListItem = List.Item
-export default class Register extends Component {
+
+class Register extends Component {
 	//初始化定义状态
 	state = {
 		username:'',//用户名
@@ -24,15 +28,21 @@ export default class Register extends Component {
 	}
 	//注 册 
 	register = () => { 
-		console.log(JSON.stringify(this.state)) 
+		this.props.register(this.state)
 	}
 
 	render() {
+		//默认选择职位
 		const {type} = this.state
+		const {msg,redirectTo} = this.props
+		if(redirectTo){
+			return <Redirect to={redirectTo} />
+		}
 		return (
 			<div>
 				<NavBar style={{ backgroundColor:'#1DA57A'}}>谷&nbsp;粒&nbsp;直&nbsp;聘&nbsp;</NavBar>
 				<Logo/>
+				{msg ? <div className="error-msg">{msg}</div> : null}
 				<WingBlank> 
 				<List> 
 					<InputItem placeholder='请输入用户名'  onChange={val => this.handleChange("username",val)}> 用户名: </InputItem> 
@@ -45,12 +55,12 @@ export default class Register extends Component {
 					<span style={{marginRight: 30}}>用户类型:</span> 
 					<Radio 
 						checked={this.state.type === 'dashen'}
-						onChange={val => this.handleChange("type",val)}
+						onClick={() => this.handleChange("type",'dashen')}
 					>大神</Radio> 
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
 					<Radio
 						checked={this.state.type === 'laoban'}
-						onChange={val => this.handleChange("type",val)}
+						onClick={() => this.handleChange("type",'laoban')}
 					>老板</Radio> 
 					</List.Item> 
 					<WhiteSpace/> 
@@ -67,3 +77,5 @@ export default class Register extends Component {
 		)
 	}
 }
+
+export default connect( state => state.user, {register} )(Register)
